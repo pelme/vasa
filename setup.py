@@ -12,7 +12,7 @@ def read(fname):
 
 setup(name='vasa',
       version=__import__('vasa').__version__,
-      description='A Continuous Integration erver',
+      description='A Continuous Integration server',
       author='Andreas Pelme',
       author_email='andreas@pelme.se',
       maintainer="Andreas Pelme",
