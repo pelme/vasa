@@ -55,10 +55,18 @@ webapp_dist/bundle.js: $(JS_EXTERNAL_MINIFIED) $(JS_COMPILED) webapp_dist
 webapp_dist/index.html: webapp_dist webapp/index.html
 	cp webapp/index.html webapp_dist/index.html
 
+watch: all
+	watchmedo shell-command \
+		--wait \
+		--recursive \
+		--patterns='*.html;*.rst;*.py;*.js;*.json;*.txt' \
+		--ignore-patterns="*build*;*webapp_dist*" \
+		--command="make all"
+
 clean:
 	rm -rf build webapp_dist
 
 full_clean: clean
 	rm -rf bower_components node_modules venv-* .pip_install
 
-.PHONY: clean full_clean deps python_deps
+.PHONY: clean full_clean deps python_deps watch
