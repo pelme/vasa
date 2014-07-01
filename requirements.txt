@@ -1,0 +1,4 @@
+-e .
+aiohttp==0.7.3
+execnet==1.2.0
+Werkzeug==0.9.4
