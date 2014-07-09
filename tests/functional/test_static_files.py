@@ -3,12 +3,6 @@ import asyncio
 
 from vasa.http.server import make_http_protocol_factory
 
-
-@pytest.fixture
-def loop():
-    return asyncio.get_event_loop()
-
-
 class Server:
     def __init__(self, server):
         self._server = server
