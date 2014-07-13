@@ -33,8 +33,10 @@ def main():
 
     logger.info('Vasa v%s, starting...' % __version__)
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(loop.create_server(make_http_protocol_factory(settings),
+    asyncio.set_event_loop(None)
+    loop = asyncio.new_event_loop()
+
+    loop.run_until_complete(loop.create_server(make_http_protocol_factory(settings, loop=loop),
                                                host=settings.http_host,
                                                port=settings.http_port))
 

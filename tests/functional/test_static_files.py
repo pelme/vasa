@@ -37,10 +37,14 @@ def server(loop, webapp_root):
     static_root_dir = str(webapp_root)
 
     class Settings:
+        http_host = 'localhost'
+        http_port = 12345
         webapp_root = static_root_dir
 
-    proto_factory = make_http_protocol_factory(Settings())
-    coro = loop.create_server(proto_factory, host='localhost', port=12345)
+    settings = Settings()
+
+    proto_factory = make_http_protocol_factory(settings, loop=loop)
+    coro = loop.create_server(proto_factory, host=settings.http_host, port=settings.http_port)
     server = loop.run_until_complete(coro)
     yield Server(server)
     server.close()
@@ -50,11 +54,12 @@ import aiohttp
 
 
 @asyncio.coroutine
-def test_simple_static_file(webapp_root, server):
+def test_simple_static_file(loop, webapp_root, server):
     FILE_CONTENTS = b'foobar'
     webapp_root.join('foo.txt').write(FILE_CONTENTS)
 
-    response = yield from aiohttp.request('GET', server.url + '/_webapp/foo.txt')
+    response = yield from aiohttp.request('GET', server.url + '/_webapp/foo.txt',
+                                          loop=loop)
 
     assert response.status == 200
     body = yield from response.read_and_close()
@@ -62,31 +67,33 @@ def test_simple_static_file(webapp_root, server):
 
 
 @asyncio.coroutine
-def test_non_existent_file(server):
-    response = yield from aiohttp.request('GET', server.url + '/_webapp/noope.txt')
+def test_non_existent_file(loop, server):
+    response = yield from aiohttp.request('GET', server.url + '/_webapp/noope.txt',
+                                          loop=loop)
     assert response.status == 404
 
 
 @asyncio.coroutine
-def test_directory_traversal_error(server):
-    response = yield from aiohttp.request('GET', server.url + '/_webapp/../../../../../../../../../../../../../../../../../etc/passwd')
+def test_directory_traversal_error(loop, server):
+    url = server.url + '/_webapp/../../../../../../../../../../../../../../../../../etc/passwd'
+    response = yield from aiohttp.request('GET', url, loop=loop)
     assert response.status == 404
 
 
 @asyncio.coroutine
-def test_content_type(server, webapp_root):
+def test_content_type(loop, server, webapp_root):
     filename = 'foo.png'
     webapp_root.join(filename).write(b'kaka')
-    response = yield from aiohttp.request('GET', server.url + '/_webapp/%s' % filename)
+    response = yield from aiohttp.request('GET', server.url + '/_webapp/%s' % filename, loop=loop)
     assert response.status == 200
     assert response.get_content_type() == 'image/png'
 
 
 @asyncio.coroutine
-def test_index(server, webapp_root):
+def test_index(loop, server, webapp_root):
     webapp_root.join('index.html').write('Hello, world')
 
-    response = yield from aiohttp.request('GET', server.url + '/')
+    response = yield from aiohttp.request('GET', server.url + '/', loop=loop)
 
     assert response.get_content_type() == 'text/html'
     body = yield from response.read_and_close()

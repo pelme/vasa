@@ -11,7 +11,7 @@ def pytest_pyfunc_call(__multicall__, pyfuncitem):
         funcargs = pyfuncitem.funcargs
         testargs = {arg: funcargs[arg] for arg in pyfuncitem._fixtureinfo.argnames}
 
-        loop = asyncio.get_event_loop()
+        loop = funcargs['loop']
         loop.run_until_complete(coro(**testargs))
 
 
@@ -20,9 +20,13 @@ def pytest_pycollect_makeitem(__multicall__, collector, name, obj):
         return list(collector._genfunctions(name, obj))
 
 
-@pytest.fixture
+@pytest.yield_fixture
 def loop():
-    return asyncio.get_event_loop()
+
+    old = asyncio.get_event_loop()
+    asyncio.set_event_loop(None)
+    yield asyncio.new_event_loop()
+    asyncio.set_event_loop(old)
 
 
 REMOTE_PYTHONS = [

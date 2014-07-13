@@ -58,6 +58,6 @@ def create_remote_subprocess_exec(*args, loop, gateway):
     channel.send(args)
 
     proc = RemoteProcess.with_loop(loop)
-    asyncio.Task(_loop(channel, proc, loop))
+    asyncio.async(_loop(channel, proc, loop), loop=loop)
 
     return proc
