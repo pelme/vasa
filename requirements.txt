@@ -2,3 +2,4 @@
 aiohttp==0.7.3
 execnet==1.2.0
 Werkzeug==0.9.4
+-e git+https://github.com/tomchristie/mkdocs.git@80c9b2842c8665a1ace189cc6991b97c996703d6#egg=mkdocs-origin/master

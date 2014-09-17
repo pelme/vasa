@@ -6,3 +6,4 @@ bower_components
 .pip_install
 build
 *.pyc
+/site
