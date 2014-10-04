@@ -1,4 +1,5 @@
 -r requirements.txt
 pytest==2.5.2
 flake8==2.1.0
-watchdog==0.7.1
+-e git+https://github.com/tomchristie/mkdocs.git@dced02f405a28184333a7965137af69657ef9804#egg=mkdocs
+watchdog==0.7.0
